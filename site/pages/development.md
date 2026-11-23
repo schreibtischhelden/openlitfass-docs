@@ -228,11 +228,20 @@ The documentation lives in
 [schreibtischhelden/openlitfass-docs](https://github.com/schreibtischhelden/openlitfass-docs):
 Markdown files in `site/`, rendered in the browser by
 [markdown-pages.js](https://github.com/schreibtischhelden/markdown-pages.js).
-On every push to `main`, a workflow copies `site/` into a checkout of
-markdown-pages.js and publishes the result to the branch `pages`.
+On every push to `main`, a workflow takes markdown-pages.js as it is at
+that moment (the script and the libraries it ships in `assets/vendor/`),
+adds `site/` and publishes the result to the branch `pages`. The site loads
+nothing from other hosts.
 
 - A page is `site/pages/<name>.md`, reachable as `?page=<name>`; the
   navigation is `site/header.md`. Links between pages use `?page=<name>#<heading-id>`.
+- The rendered HTML is sanitised (DOMPurify) and the page has a Content
+  Security Policy: `<script>`, `<style>`, `<iframe>` and inline event
+  handlers in Markdown are removed. Behaviour belongs in
+  `site/assets/docs.js`, styles in `site/assets/docs.css`.
+- Heading ids that clash with names of the browser's `document` object are
+  removed by the sanitiser, so a heading "Fonts" or "Attributes" gets no
+  anchor. Choose a more specific heading ("Web fonts").
 - `scripts/preview.sh` builds the same site locally and serves it at
   <http://localhost:8000> (Docker).
 - Update the documentation in the same pull request cycle as the feature:

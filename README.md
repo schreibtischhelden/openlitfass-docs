@@ -6,7 +6,9 @@ self-hosted static events calendar.
 
 This repository holds only the content. The pages are Markdown, rendered in
 the browser by
-[markdown-pages.js](https://github.com/schreibtischhelden/markdown-pages.js).
+[markdown-pages.js](https://github.com/schreibtischhelden/markdown-pages.js),
+which brings its libraries (Showdown, DOMPurify, highlight.js) along in
+`assets/vendor/`; the site loads nothing from other hosts.
 
 ## Layout
 
@@ -16,9 +18,14 @@ site/
   pages/<name>.md      one file per page, reachable as ?page=<name>
   header.md            sidebar: logo, search, navigation
   footer.md            footer
-  index.html           page shell
-  404.html             page for unknown addresses
-  assets/              docs.css, docs.js (navigation, search, contents), images
+  404.md               shown for an unknown ?page=
+  index.html           page shell with the Content Security Policy
+  404.html             GitHub Pages' page for unknown paths
+  assets/
+    setup.js           renderer options and saved theme, before rendering
+    docs.js            navigation, search, contents, code highlighting, theme switch
+    docs.css           layout and colours
+    img/               images
 scripts/
   assemble.sh          renderer + site/ → finished site
   preview.sh           local preview at http://localhost:8000 (Docker)
@@ -34,6 +41,16 @@ scripts/
 - A new page also needs an entry in `site/header.md`; the search covers
   exactly the pages listed there.
 - Images go into `site/assets/img/`.
+- The rendered HTML is sanitised with DOMPurify: `<script>`, `<style>`,
+  `<iframe>` and inline event handlers (`onclick`) are removed, and the
+  Content Security Policy in `index.html` allows scripts from this site
+  only. Put behaviour into `assets/docs.js` and styles into
+  `assets/docs.css`.
+- The sanitiser also drops heading ids that clash with names of the browser's
+  `document` object (for example "Fonts", "Attributes"); such a heading gets
+  no anchor. Use a more specific heading.
+- Fenced code blocks with a language (` ```json `, ` ```sh `, ` ```yaml `) are
+  highlighted; highlight.js is loaded only on pages that have them.
 
 ## Preview
 
@@ -50,13 +67,14 @@ server keeps running.
 
 On every push to `main` that changes `site/` or the workflow,
 `.github/workflows/pages.yml` checks out markdown-pages.js as it is at that
-moment, copies `site/` into it and force-pushes the result as a single commit
-to the branch `pages`, with `CNAME` `docs.openlitfass.org`. GitHub Pages
-serves that branch. Changes in markdown-pages.js take effect with the next
-push here; they do not trigger a build themselves (run the workflow by hand
-if needed).
+moment, takes `markdown-pages.js` and `assets/vendor/` from it, adds `site/`
+and force-pushes the result as a single commit to the branch `pages`, with
+`CNAME` `docs.openlitfass.org`. GitHub Pages serves that branch. Changes in
+markdown-pages.js take effect with the next push here; they do not trigger a
+build themselves (run the workflow by hand if needed).
 
 ## Licence
 
-[MIT](LICENSE). markdown-pages.js is published with its own licence, which is
-copied into the built site as `LICENSE-markdown-pages.txt`.
+[MIT](LICENSE). markdown-pages.js and the libraries in `assets/vendor/` keep
+their own licences, which are copied into the built site
+(`LICENSE-markdown-pages.txt`, `assets/vendor/*/LICENSE*`).

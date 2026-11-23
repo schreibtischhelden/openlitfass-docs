@@ -19,9 +19,12 @@ fi
 # that has it mounted keeps seeing the new files.
 mkdir -p "$out"
 find "$out" -mindepth 1 -delete
-# Only the renderer and its licence; its sample pages, assets and README
+# Only the renderer, the libraries it loads from assets/vendor/ (each with
+# its licence) and its own licence; its sample pages, styles and README
 # would otherwise show up next to ours.
 cp "$renderer/markdown-pages.js" "$out/"
 cp "$renderer/LICENSE" "$out/LICENSE-markdown-pages.txt"
+mkdir -p "$out/assets"
+cp -r "$renderer/assets/vendor" "$out/assets/"
 cp -r "$root/site/." "$out/"
 echo "assembled $(find "$out" -type f | wc -l | tr -d ' ') files in $out"

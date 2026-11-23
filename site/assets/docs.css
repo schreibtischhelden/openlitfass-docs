@@ -12,6 +12,7 @@
 	--link: #2F5A7A;
 	--accent: #B4532A;
 	--code-bg: #EFEDE7;
+	--hl-string: #4B6E2F;
 	--note-bg: #E0EAEE;
 	--note-border: #3B7A94;
 	--warn-bg: #F6ECDE;
@@ -36,6 +37,7 @@
 		--link: #93B6C4;
 		--accent: #E08A62;
 		--code-bg: #222E3A;
+		--hl-string: #A8C98A;
 		--note-bg: #1D3441;
 		--warn-bg: #3A3020;
 		--focus: #93B6C4;
@@ -54,6 +56,7 @@
 	--link: #93B6C4;
 	--accent: #E08A62;
 	--code-bg: #222E3A;
+	--hl-string: #A8C98A;
 	--note-bg: #1D3441;
 	--warn-bg: #3A3020;
 	--focus: #93B6C4;
@@ -158,11 +161,6 @@ main {
 main:focus { outline: none; }
 .loading { color: var(--muted); }
 
-/* markdown-pages.js turns every line break into <br> (Showdown option
-   simpleLineBreaks). The Markdown here is wrapped for readable diffs, so the
-   breaks are hidden; the newline after each <br> still separates the words. */
-main p br, main li br, main blockquote br, main td br, footer br { display: none; }
-
 main h1 { font-size: 2.1rem; line-height: 1.2; margin: .5rem 0 1rem; color: var(--primary); }
 main h2 { font-size: 1.45rem; margin: 2.5rem 0 .75rem; padding-top: .5rem; border-top: 1px solid var(--border); }
 main h3 { font-size: 1.15rem; margin: 2rem 0 .5rem; }
@@ -181,6 +179,13 @@ pre {
 	overflow-x: auto; line-height: 1.5; border: 1px solid var(--border);
 }
 pre code { background: none; padding: 0; font-size: .85rem; }
+
+/* highlight.js tokens in the docs' own colours */
+.hljs-comment, .hljs-meta { color: var(--muted); font-style: italic; }
+.hljs-keyword, .hljs-built_in, .hljs-selector-tag, .hljs-section { color: var(--primary); font-weight: 600; }
+.hljs-string, .hljs-attribute, .hljs-symbol, .hljs-template-variable { color: var(--hl-string); }
+.hljs-attr, .hljs-variable, .hljs-property, .hljs-selector-class, .hljs-name { color: var(--link); }
+.hljs-number, .hljs-literal { color: var(--accent); }
 
 table {
 	display: block; overflow-x: auto; border-collapse: collapse;

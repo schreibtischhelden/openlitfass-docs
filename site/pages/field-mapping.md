@@ -86,7 +86,7 @@ date.
 | `start`, `end` | timestamps with `format` (recommended) |
 | `date`, `startTime`, `endTime` | alternatively the parts, already as `YYYY-MM-DD` and `HH:MM` |
 | `price` | [price object](#price) |
-| `ticketRequired`, `registrationRequired`, `familyFriendly`, `cancelled` | [attribute rules](#attributes) |
+| `ticketRequired`, `registrationRequired`, `familyFriendly`, `cancelled` | [attribute rules](#attribute-rules) |
 
 **Text is always cleaned:** HTML tags are removed, entities decoded
 (`&#8211;` → `–`), soft hyphens and zero-width characters removed and
@@ -150,7 +150,7 @@ Free text, for example "Eintritt frei" or "12,50 €":
 sources that leave the price out when they do not know it; otherwise those
 events would show as free.
 
-## Attributes
+## Attribute rules
 
 `ticketRequired`, `registrationRequired`, `familyFriendly` and `cancelled`
 read the value at `path` as a Boolean. With `equals`, they are true when the

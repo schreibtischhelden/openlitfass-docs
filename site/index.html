@@ -3,6 +3,10 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- Scripts, styles, data and images from this site only; images may also
+	     come from https: (none do today). No forms, no frames. -->
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; connect-src 'self'; font-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
+	<meta name="referrer" content="strict-origin-when-cross-origin">
 	<title>openLitfass docs</title>
 	<meta name="description" content="Documentation for openLitfass, the self-hosted static events calendar: setup, sources, configuration, operation and development.">
 	<meta name="theme-color" content="#2F3E4E">
@@ -10,13 +14,8 @@
 	<link rel="icon" href="assets/img/favicon-32.png" type="image/png" sizes="32x32">
 	<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 	<link rel="stylesheet" href="assets/docs.css">
-	<script>
-		try {
-			var theme = localStorage.getItem('ol-docs-theme');
-			if (theme === 'light' || theme === 'dark') document.documentElement.setAttribute('data-theme', theme);
-		} catch (e) {}
-	</script>
 	<script src="markdown-pages.js"></script>
+	<script src="assets/setup.js"></script>
 </head>
 
 <body>

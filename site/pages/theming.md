@@ -86,7 +86,7 @@ For an installable app and a sharp home-screen icon, add
 only if present; `build-site` writes `manifest.webmanifest` with `name`,
 `shortName` and `themeColor` from `instance.json`.
 
-## Fonts
+## Web fonts
 
 The core uses the system font stack, so no font is downloaded. To use your
 own font, put the font files into `site/` (for example `site/fonts/`) and

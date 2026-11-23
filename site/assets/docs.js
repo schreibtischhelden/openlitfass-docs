@@ -1,7 +1,7 @@
-/* openLitfass docs: navigation, table of contents, search and theme switch
-   on top of markdown-pages.js. markdown-pages.js fills <header>, <main> and
-   <footer> asynchronously and has no callback, so the enhancements wait for
-   that with a MutationObserver. */
+/* openLitfass docs: navigation, table of contents, search, code
+   highlighting and theme switch on top of markdown-pages.js, which fills
+   <header>, <main> and <footer> asynchronously and announces each region
+   with the event "mdp:rendered". */
 (function () {
 	'use strict';
 
@@ -10,17 +10,18 @@
 	var params = new URLSearchParams(window.location.search);
 	var currentPage = params.get('page') || '';
 
-	function whenRendered(el, callback) {
+	function onRendered(region, callback) {
 		var done = false;
-		function check() {
-			if (done || el.querySelector('.loading') || !el.firstElementChild) return;
+		document.addEventListener('mdp:rendered', function (event) {
+			if (done || !event.detail || event.detail.region !== region) return;
 			done = true;
-			observer.disconnect();
-			callback(el);
-		}
-		var observer = new MutationObserver(check);
-		observer.observe(el, { childList: true });
-		check();
+			callback(document.querySelector(region), event.detail.page);
+		});
+	}
+
+	function vendorUrl(path) {
+		var base = (window.MarkdownPages && window.MarkdownPages.baseUrl) || document.baseURI;
+		return new URL('assets/vendor/' + path, base).href;
 	}
 
 	function pageOf(href) {
@@ -110,10 +111,10 @@
 
 		function buildIndex() {
 			if (loading) return loading;
-			var converter = new window.showdown.Converter({ tables: true, ghCompatibleHeaderId: true, strikethrough: true });
 			loading = Promise.all(pages.map(function (p) {
 				return fetch(sourceFile(p.page)).then(function (r) { return r.ok ? r.text() : ''; }).then(function (md) {
-					var doc = new DOMParser().parseFromString(converter.makeHtml(md), 'text/html');
+					// the renderer's own conversion, so heading ids match the pages
+					var doc = new DOMParser().parseFromString(window.MarkdownPages.toHtml(md), 'text/html');
 					var sections = [];
 					var section = { id: '', heading: p.title, text: '' };
 					Array.prototype.forEach.call(doc.body.children, function (el) {
@@ -208,7 +209,7 @@
 
 	/* content */
 
-	function enhanceContent(main) {
+	function enhanceContent(main, notFound) {
 		var headings = main.querySelectorAll('h2[id], h3[id]');
 		headings.forEach(function (h) {
 			var anchor = document.createElement('a');
@@ -255,13 +256,15 @@
 			main.insertBefore(toc, h2s[0]);
 		}
 
-		var meta = document.createElement('p');
-		meta.className = 'page-meta';
-		var edit = document.createElement('a');
-		edit.href = REPO + '/edit/main/site/' + sourceFile(currentPage);
-		edit.textContent = 'Edit this page on GitHub';
-		meta.appendChild(edit);
-		main.appendChild(meta);
+		if (!notFound) {
+			var meta = document.createElement('p');
+			meta.className = 'page-meta';
+			var edit = document.createElement('a');
+			edit.href = REPO + '/edit/main/site/' + sourceFile(currentPage);
+			edit.textContent = 'Edit this page on GitHub';
+			meta.appendChild(edit);
+			main.appendChild(meta);
+		}
 
 		if (window.location.hash) {
 			var target = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
@@ -269,7 +272,29 @@
 		}
 	}
 
+	/* code highlighting: highlight.js comes with markdown-pages.js and is
+	   loaded only on pages with code blocks in a known language */
+
+	function highlightCode(main) {
+		var blocks = Array.prototype.filter.call(main.querySelectorAll('pre code[class]'), function (code) {
+			return /language-[\w-]+/.test(code.className);
+		});
+		if (!blocks.length) return;
+		var script = document.createElement('script');
+		script.src = vendorUrl('highlightjs/highlight.min.js');
+		script.onload = function () {
+			blocks.forEach(function (code) {
+				var language = /language-([\w-]+)/.exec(code.className)[1];
+				if (window.hljs.getLanguage(language)) window.hljs.highlightElement(code);
+			});
+		};
+		document.head.appendChild(script);
+	}
+
 	setUpMenuToggle();
-	whenRendered(document.querySelector('header'), enhanceSidebar);
-	whenRendered(document.querySelector('main'), enhanceContent);
+	onRendered('header', enhanceSidebar);
+	onRendered('main', function (main, page) {
+		enhanceContent(main, page === '404.md');
+		highlightCode(main);
+	});
 })();
