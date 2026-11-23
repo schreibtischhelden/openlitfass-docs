@@ -107,6 +107,25 @@ arrange, act, assert pattern and cover new behaviour, including the error
 paths. There are no automated front-end tests; check front-end changes in
 the browser.
 
+### Verified against real sources
+
+Beyond the automated checks, the source types have been verified against
+real data:
+
+- `json`: Brotfabrik (WordPress "The Events Calendar", four pages, 192 events
+  in 30 days), with pagination, a template address, `categoryMap` and HTML
+  cleaning.
+- `ical`: an Events Manager export (Freilichtbühne Weißensee), kept as a test
+  fixture, plus tests for time zones, all-day events, `RRULE`, `EXDATE` and
+  `RECURRENCE-ID`.
+- `wcs`: Familienzentrum Weißensee, 95 events, with status field and
+  `sources.json`; an inbox event included in the same run.
+- `rss`: KuBiZ Raoul Wallenberg in weissens.ee.
+- `html`: a fixture modelled on a Joomla JEvents list: selector engine,
+  German month names, all-day events, cancellation markers in titles.
+- `build-site` against the example instance and weissens.ee: complete site
+  including manifest, `site.json` and stamped service worker.
+
 ## Benchmarks
 
 Benchmarks cover the expensive paths: HTML extraction, iCalendar parsing of
