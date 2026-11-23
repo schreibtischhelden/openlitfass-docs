@@ -1,0 +1,1 @@
+[openLitfass](https://openlitfass.org) · [Source code](https://github.com/schreibtischhelden/openlitfass) · [Improve this documentation](https://github.com/schreibtischhelden/openlitfass-docs) · MIT Licence

@@ -1,0 +1,59 @@
+name: Pages
+
+# Publishes the documentation to the branch "pages" for GitHub Pages.
+# This repository holds only the content (site/). The renderer comes from
+# schreibtischhelden/markdown-pages.js, checked out as it is at the time of
+# the run: a change there takes effect with the next push here, it does not
+# trigger a build on its own. The pages branch holds a single commit that is
+# replaced on every run.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  # Custom domain for GitHub Pages (written as CNAME). Empty = served at
+  # https://schreibtischhelden.github.io/openlitfass-docs/
+  PAGES_DOMAIN: docs.openlitfass.org
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push the pages branch
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check out markdown-pages.js
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: schreibtischhelden/markdown-pages.js
+          path: .renderer
+          persist-credentials: false
+
+      - name: Assemble site
+        run: scripts/assemble.sh .renderer "$RUNNER_TEMP/site"
+
+      - name: Publish to branch pages
+        run: |
+          cd "$RUNNER_TEMP/site"
+          touch .nojekyll
+          if [ -n "$PAGES_DOMAIN" ]; then echo "$PAGES_DOMAIN" > CNAME; fi
+          git init -q -b pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Pages build ${GITHUB_SHA::7}"
+          git push -q --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" pages
