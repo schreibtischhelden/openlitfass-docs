@@ -239,9 +239,6 @@ nothing from other hosts.
   Security Policy: `<script>`, `<style>`, `<iframe>` and inline event
   handlers in Markdown are removed. Behaviour belongs in
   `site/assets/docs.js`, styles in `site/assets/docs.css`.
-- Heading ids that clash with names of the browser's `document` object are
-  removed by the sanitiser, so a heading "Fonts" or "Attributes" gets no
-  anchor. Choose a more specific heading ("Web fonts").
 - `scripts/preview.sh` builds the same site locally and serves it at
   <http://localhost:8000> (Docker).
 - Update the documentation in the same pull request cycle as the feature:

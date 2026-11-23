@@ -46,9 +46,6 @@ scripts/
   Content Security Policy in `index.html` allows scripts from this site
   only. Put behaviour into `assets/docs.js` and styles into
   `assets/docs.css`.
-- The sanitiser also drops heading ids that clash with names of the browser's
-  `document` object (for example "Fonts", "Attributes"); such a heading gets
-  no anchor. Use a more specific heading.
 - Fenced code blocks with a language (` ```json `, ` ```sh `, ` ```yaml `) are
   highlighted; highlight.js is loaded only on pages that have them.
 
