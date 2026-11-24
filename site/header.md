@@ -22,6 +22,7 @@
 #### Configuration
 
 - [Configuration reference](?page=configuration)
+- [Config UI ↗](https://config.openlitfass.org)
 - [Theming](?page=theming)
 - [Static pages and SEO](?page=seo)
 

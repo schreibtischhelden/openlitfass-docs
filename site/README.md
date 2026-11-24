@@ -31,6 +31,10 @@ no tracking.
 - **One container image** (`ghcr.io/schreibtischhelden/openlitfass`, amd64 and
   arm64) that fetches, builds and serves an instance, with `/healthz` and
   Prometheus metrics.
+- **Config UI** at [config.openlitfass.org](https://config.openlitfass.org):
+  forms that build `instance.json`, `categories.json`, `places.json`, inbox
+  events and source files in the browser, so you do not have to write the
+  JSON by hand.
 
 ## How it fits together
 
@@ -63,6 +67,7 @@ workflow that publishes to GitHub Pages.
 <div class="cards">
 <a href="?page=setup"><strong>Setup</strong>Create an instance and run it with Docker or GitHub Actions.</a>
 <a href="?page=sources"><strong>Sources</strong>Connect feeds, calendars and websites.</a>
+<a href="https://config.openlitfass.org"><strong>Config UI ↗</strong>Build the configuration files with forms in the browser.</a>
 <a href="?page=configuration"><strong>Configuration reference</strong>Every setting in <code>instance.json</code>, source files and <code>OL_</code> variables.</a>
 <a href="?page=troubleshooting"><strong>Troubleshooting</strong>A source fails, nothing shows up, changes do not appear.</a>
 </div>

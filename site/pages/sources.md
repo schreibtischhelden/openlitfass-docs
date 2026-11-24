@@ -33,7 +33,9 @@ order, and builds one fetcher per file according to its `type`:
    only HTML. [Finding sources](?page=source-discovery) has search patterns
    and the feed URLs of common platforms.
 2. Copy the matching template from the example instance into `sources/`, for
-   example `beispiel-ical.example.json` → `freilichtbuehne.json`.
+   example `beispiel-ical.example.json` → `freilichtbuehne.json`. Or let the
+   [source wizard](https://config.openlitfass.org/?page=source) of the config
+   UI build the file, including field mapping and filters.
 3. Set `url`, `label` and `homepage`, and for `rss`, `json` and `html` the
    [field mapping](?page=field-mapping).
 4. Run `fetch` (or push and let the workflow run) and check the source's

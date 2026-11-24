@@ -3,7 +3,9 @@
 An optional `places.json` in the instance adds a tab **"Orte"** (places) next
 to "Termine" (events): sights, parks, venues, meeting points, markets, the
 things in a neighbourhood that have no date. Each place lists the upcoming
-events held there. Without `places.json`, the tab is hidden.
+events held there. Without `places.json`, the tab is hidden. The
+[config UI](https://config.openlitfass.org/?page=places) edits `places.json`
+with a form.
 
 ## places.json
 
