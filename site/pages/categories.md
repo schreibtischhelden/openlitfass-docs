@@ -3,7 +3,8 @@
 Every event has exactly one **category**, which decides its icon and where
 it appears in the category filter. The instance defines its categories in
 `categories.json`; sources translate their own names into them with
-`categoryMap`.
+`categoryMap`. The [config UI](https://config.openlitfass.org/?page=categories)
+edits `categories.json` with a form.
 
 ## categories.json
 

@@ -14,6 +14,13 @@ No, for almost all sources. RSS, JSON, iCalendar, HTML pages and WordPress
 formats with logins, POST requests or authentication need a small Go source
 in the core ([Development](?page=development#a-source-with-custom-go-code)).
 
+## Do I have to write the JSON files by hand?
+
+No. The [config UI](https://config.openlitfass.org) builds `instance.json`,
+`categories.json`, `places.json`, inbox events and source files with forms in
+the browser. Nothing is sent to a server; download the file and put it into
+the instance directory.
+
 ## Why is every source a file of its own?
 
 A change to a source touches one file: clean diffs, no merge conflicts, and

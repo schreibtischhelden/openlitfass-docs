@@ -3,6 +3,9 @@
 An instance is configured by files in its directory and, when it runs as a
 container, by environment variables. This page lists every setting.
 
+The [config UI](https://config.openlitfass.org) builds the JSON files with
+forms in the browser and can import an existing file to change it.
+
 | File | Purpose | Page |
 |---|---|---|
 | `instance.json` | name, texts, time zone, links | [below](#instancejson) |

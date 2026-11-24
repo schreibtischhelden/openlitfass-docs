@@ -3,7 +3,9 @@
 The inbox is the manual counterpart to the sources: for events that arrive
 through no feed, such as a flyer, a phone call or a tip from the
 neighbourhood. Put **one JSON file per event** into the instance's `inbox/`
-directory and commit it. No URL and no mapping are needed.
+directory and commit it. No URL and no mapping are needed. The
+[config UI](https://config.openlitfass.org/?page=inbox) builds the file with a
+form, also for recurring events.
 
 ## A single event
 

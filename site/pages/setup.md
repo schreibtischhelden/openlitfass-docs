@@ -16,18 +16,25 @@ Both ways use the same instance directory, so you can switch later.
 
 ## Create an instance
 
+> **Tip:** the [config UI](https://config.openlitfass.org) builds
+> `instance.json`, `categories.json`, `places.json`, inbox events and source
+> files with forms in the browser. Nothing is sent to a server; you download
+> the file and put it into the instance directory.
+
 1. Create a new, empty repository (or directory) for your calendar.
 2. Copy the content of
    [`example-instance/`](https://github.com/schreibtischhelden/openlitfass/tree/main/example-instance)
    from the core repository into it.
-3. Edit `instance.json`: at least `name`, `title`, `baseUrl` and `timezone`.
+3. Edit `instance.json`: at least `name`, `title`, `baseUrl` and `timezone`,
+   by hand or with the [config UI](https://config.openlitfass.org/?page=instance).
    All fields: [instance.json](?page=configuration#instancejson).
 4. Adapt the legal notice (`site/impressum.html`) and the privacy policy
    (`site/datenschutz.html`), or point `imprintUrl` and `privacyUrl` to
    existing pages. A public website operated in Germany needs a legal notice.
 5. Add sources: copy a template from `sources/`, remove `.example` from the
-   file name and adjust the URL and mapping. See [Sources](?page=sources) and
-   [Finding sources](?page=source-discovery).
+   file name and adjust the URL and mapping, or create the file with the
+   [source wizard](https://config.openlitfass.org/?page=source). See
+   [Sources](?page=sources) and [Finding sources](?page=source-discovery).
 6. Optional: colours and logo in `site/` ([Theming](?page=theming)), venues in
    `places.json` ([Places](?page=places)), holidays in `holidays.json`
    ([Event inbox](?page=inbox#day-lists-holidaysjson)).
