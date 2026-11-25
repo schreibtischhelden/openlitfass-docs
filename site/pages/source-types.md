@@ -6,6 +6,10 @@ need a [field mapping](?page=field-mapping); `html` reads the page layout and
 breaks when the layout changes. Templates for every type are in the example
 instance's `sources/` directory.
 
+For platforms that many sites share, the core ships [presets](#presets): the
+source file then only names the preset and a few parameters. Listings that
+need more than one request use [steps](#steps).
+
 ## iCalendar
 
 For calendar exports from Google Calendar, Nextcloud, Outlook and most
@@ -237,6 +241,124 @@ reads that endpoint directly.
 > are local times. The `wcs` type therefore reads them as the instance's local
 > time. This is a verified quirk of this plugin, not a rule: for every new
 > source, compare a few times with the website.
+
+## Steps
+
+Some listings can't be read with one request. An event widget may put only
+the event IDs into its page and load the entries from a second address; an
+overview page may link to detail pages. `steps` run before the main request
+and **collect variables** instead of events. The main request then uses them.
+Steps work with every type that fetches a `url` (`html`, `json`, `rss`,
+`ical`).
+
+```json
+{
+  "type": "html",
+  "daysAhead": 14,
+  "steps": [
+    {
+      "url": "https://example.org/widget/?dateFrom={today}&dateTo={until}",
+      "collect": {
+        "ids": { "selector": "[data-idents]", "attr": "data-idents", "split": "," }
+      }
+    }
+  ],
+  "url": "https://example.org/widget/items?layout=list",
+  "forEach": { "var": "ids", "param": "object[]", "batch": 100 },
+  "itemSelector": "article[data-ident]",
+  "extract": { "title": "h2" },
+  "mapping": { "title": { "path": "title" } }
+}
+```
+
+A step has a `url`, an optional `type` (`html`, the default, or `json`) and
+`collect`, which names the variables it produces:
+
+| Field | Meaning |
+|---|---|
+| `selector` | `html`: CSS selector, matched against the whole page; every match counts |
+| `attr` | `html`: an attribute instead of the text; relative `href`/`src` are resolved |
+| `path` | `json`: dot path; `*` stands for every element of an array, for example `data.*.id` |
+| `regex` | extract part of each value ([rules](?page=field-mapping#extracting-with-regex)); no match drops it |
+| `split` | split each value further, for example `","` for `a,b,c` |
+
+Values are trimmed, empty ones dropped and duplicates removed. A variable
+that ends up empty is an error in the source's
+[status](?page=sources#health-status), as when `itemSelector` finds nothing.
+
+**Placeholders** in the URLs of steps and of the main request:
+
+- `{today}` and `{until}`: today and today + `daysAhead` (default 30), as
+  `YYYY-MM-DD` in the instance's time zone. They also work without steps,
+  for example in an iCal URL that wants a date range.
+- `{name}`: the first value of a collected variable.
+- `{item}`: the current value of `forEach` (see below).
+
+Values are query-escaped, except when a placeholder is the whole URL
+(`"url": "{item}"` for collected links). An unknown placeholder is an error.
+
+**`forEach`** repeats the main request for the values of a variable:
+
+- with `param`, values are added as repeated query parameters
+  (`object[]=a&object[]=b`), `batch` values per request (default 1);
+- without `param`, one request per value, with `{item}` in `url`.
+
+The events of all requests are combined. If one request fails, the events of
+the others are kept. `maxRequests` (default 20) caps the requests of one run;
+the rest is skipped with a log line.
+
+Slow endpoints can get more time with `timeoutSeconds` (default 20, at most
+180; the whole run has five minutes). Keep the number of requests small: every
+run repeats all of them, and each one costs the site's server work too.
+
+## Presets
+
+A preset is a source config for a platform that many sites use with the same
+markup. It ships with the core, so a change of the platform is fixed once, in
+a release, instead of in every instance. The source file names the preset and
+fills its parameters:
+
+```json
+{
+  "label": "Veranstaltungen Stralsund",
+  "preset": "infomax",
+  "params": {
+    "host": "tmvwhl.infomaxnet.de",
+    "permalink": "stadt-stralsund-de",
+    "widgetToken": "4YRcdHbzey0."
+  },
+  "daysAhead": 30
+}
+```
+
+Every other field of the file overrides the preset: plain values and arrays
+replace the preset's, objects such as `mapping` or `extract` are merged key by
+key. `"mapping": { "category": { "default": "Kultur" } }` changes only the
+category and keeps the rest of the preset's mapping. The status is written
+into the source file; the preset itself never changes.
+
+An unknown preset, a missing required parameter or a parameter the preset
+doesn't have makes the pipeline skip the file with a log line.
+
+### infomax
+
+Event widget by infomax websolutions, used for example by the tourism board
+of Mecklenburg-Western Pomerania. The parameters are in the widget URL
+`https://<host>/<permalink>/?widgetToken=<widgetToken>`:
+
+| Parameter | Required | Example |
+|---|---|---|
+| `host` | yes | `tmvwhl.infomaxnet.de` |
+| `permalink` | yes | `stadt-stralsund-de` |
+| `widgetToken` | yes | `4YRcdHbzey0.` |
+| `language` | no, default `de` | `de` |
+
+The preset reads the event IDs from the widget page for `daysAhead` (default
+14) and loads the entries in batches of 100. The widget renders uncached
+entries slowly (about half a second each), so the preset allows 180 seconds;
+keep `daysAhead` as small as the calendar needs. The category is the first
+one the widget lists; map it with `categoryMap`. Check with the operator of
+the widget whether you may reuse its events.
 
 ## Time zones
 

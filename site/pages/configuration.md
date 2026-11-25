@@ -67,6 +67,7 @@ type-specific ones in [Source types](?page=source-types).
 |---|---|---|
 | `type` | all | `rss`, `json`, `ical`, `html`, `wcs` |
 | `url` | all | feed, API, page, or site base URL (`wcs`) |
+| `preset`, `params` | all | [preset](?page=source-types#presets) and its parameters |
 | `name` | all | identifier; default: file name |
 | `label` | all | display name |
 | `homepage` | all | organiser's website |
@@ -83,6 +84,10 @@ type-specific ones in [Source types](?page=source-types).
 | `itemsPath` | `json` | dot path to the array of items |
 | `nextPath` | `json` | dot path to the next page's URL |
 | `maxPages` | `json` | page limit, default `10` |
+| `steps` | all but `wcs` | [requests before the main one](?page=source-types#steps) that collect variables |
+| `forEach` | all but `wcs` | repeat the main request per value or batch |
+| `maxRequests` | all but `wcs` | request limit for `forEach`, default `20` |
+| `timeoutSeconds` | all | time limit of the source, default `20`, at most `180` |
 | `itemSelector` | `html` | CSS selector of one event |
 | `sectionSelector` | `html` | headings that group events |
 | `extract` | `html` | named values per event |
