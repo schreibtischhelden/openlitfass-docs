@@ -195,8 +195,8 @@ update take place until you remove it.
 
 A single broken source never breaks the run:
 
-- each source has its own timeout (20 seconds), so a hanging server does not
-  use up the time of the others;
+- each source has its own timeout (20 seconds, `timeoutSeconds` raises it),
+  so a hanging server does not use up the time of the others;
 - a crash inside a source (a panic caused by unexpected data) becomes a
   logged error of that source;
 - a source that fails keeps its events from the previous run;

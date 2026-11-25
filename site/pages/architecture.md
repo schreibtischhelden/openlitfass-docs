@@ -55,8 +55,8 @@ diff of a run shows only real changes.
 
 Every source is wrapped in the same layers:
 
-- **Timeout** per source (20 seconds), so a hanging server does not use up
-  the time of the others. The whole run has an outer limit of five minutes.
+- **Timeout** per source (20 seconds, at most 180 with `timeoutSeconds`), so
+  a hanging server does not use up the time of the others. The whole run has an outer limit of five minutes.
 - **Panic recovery:** a crash inside a source, for example caused by
   unexpected data, becomes an error of that source.
 - **Common filters** as described above.
