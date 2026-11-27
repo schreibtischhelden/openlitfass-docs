@@ -13,6 +13,7 @@ site/
   icon-512.png         optional: PWA icon
   impressum.html       legal notice (if imprintUrl points here)
   datenschutz.html     privacy policy (if privacyUrl points here)
+  custom-script.js     optional: your own script on every page
   …                    any other files: fonts, images, robots.txt
 ```
 
@@ -94,6 +95,35 @@ declare them in `theme.css` with `@font-face`. Host fonts yourself rather
 than loading them from a third-party service, which would receive every
 visitor's IP address.
 
+## Custom script
+
+If `site/custom-script.js` exists, every generated page loads it at the end
+of `<head>` with `defer`: the start page and, with static pages enabled,
+the event, list and place pages. Without the file, no script tag is added.
+It survives core updates, so it is the place for your own additions, for
+example privacy-friendly visitor statistics such as a self-hosted Plausible
+or Umami. The script can load the provider's script itself:
+
+```js
+const s = document.createElement("script");
+s.defer = true;
+s.src = "https://stats.example.org/js/script.js";
+s.dataset.domain = "example.events";
+document.head.appendChild(s);
+```
+
+Keep in mind:
+
+- The app switches views with the URL hash (`#orte`, `#<event-id>`). A
+  statistics script counts the first page view; whether it also counts
+  these switches depends on the provider and its hash mode.
+- The service worker keeps neither `custom-script.js` nor scripts from
+  other origins in its offline cache; offline, they are simply not loaded.
+- If your hosting sends a Content Security Policy, allow the script's
+  origin there.
+- Describe the tool in your privacy policy (see below), and add a consent
+  banner if your tool requires one.
+
 ## Legal pages
 
 The example instance contains templates for a legal notice
@@ -107,7 +137,8 @@ The privacy policy should mention:
 - the map tiles from `tile.openstreetmap.org`, which are loaded only after a
   click on "Karte anzeigen" and receive the visitor's IP address;
 - that saved events and the light/dark choice are stored only in the
-  browser.
+  browser;
+- whatever `site/custom-script.js` loads, if you use it.
 
 openLitfass itself sets no cookies and uses no tracking.
 
