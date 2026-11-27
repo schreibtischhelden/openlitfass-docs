@@ -46,6 +46,38 @@ translates them, case-insensitively:
 A source without a category gets the `default` of its mapping rule, or
 otherwise the fallback category.
 
+## Splitting a coarse category
+
+Some sources file very different events under one category, for example
+workshops, flea markets and guided tours all under "Extra". `categoryMap`
+translates a category only one to one. `categoryRules` sets the category by
+regular expression instead:
+
+```json
+"categoryMap": { "Extra": "Unkategorisiert", "Bühne": "Kultur" },
+"categoryRules": [
+  { "field": "title", "regex": "(?i)workshop|bastel|aquarell", "category": "Mitmachen" },
+  { "field": "title", "regex": "(?i)(advents|weihnachts|floh)markt\\b", "category": "Markt" },
+  { "field": "title", "regex": "(?i)\\b(stadt|abend)?führung(en)?\\b|rundgang", "category": "Führungen" }
+]
+```
+
+- The rules are checked in order; the **first match** sets the category.
+  Without a match the category stays as it is.
+- Fields are the same as for `include`/`exclude`: `title`, `location`,
+  `organizer`, `category`, `description`. A `category` rule sees the value
+  after `categoryMap`.
+- Order of processing: `categoryMap`, then `categoryRules`, then the
+  `categories` allowlist and `include`/`exclude`, so the filters see the
+  final category.
+- Rules with an unknown field, an invalid regular expression or an empty
+  `category` are logged and skipped.
+- Use word boundaries (`\b`, written `\\b` in JSON) to avoid false matches:
+  "Aufführung" must not match "Führung".
+- Go's regular expressions have no lookahead. To protect a category from
+  later rules, put a rule first that maps it to itself, for example
+  `{ "field": "category", "regex": "^Umland$", "category": "Umland" }`.
+
 ## New categories appear on their own
 
 `fetch` writes `data/categories.json` from the registry and the events of the
