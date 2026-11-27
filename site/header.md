@@ -38,6 +38,7 @@
 
 - [How it works](?page=architecture)
 - [Data formats](?page=data-formats)
+- [Settings on the device](?page=settings)
 - [Development](?page=development)
 - [Releases](?page=releases)
 

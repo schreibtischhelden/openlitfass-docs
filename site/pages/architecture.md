@@ -115,4 +115,9 @@ without a build step. It reads:
 The service worker (`sw.js`) precaches the app and keeps the most recently
 loaded data available offline.
 
+Visitor preferences (colour scheme, maps, images) and the saved events live
+only in the browser's `localStorage`; there are no cookies and no server-side
+state. The storage schema and its migrations: [Settings on the
+device](?page=settings).
+
 Formats of these files: [Data formats](?page=data-formats).

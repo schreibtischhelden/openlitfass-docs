@@ -32,6 +32,7 @@ ending in `.example.json` are not read.
 | `date` | required (unless `repeat` is set), `YYYY-MM-DD` |
 | `startTime`, `endTime` | `HH:MM`; without `startTime` the event is all-day |
 | `description`, `category`, `organizer`, `url` | as for any event |
+| `image` | optional `https` URL of an image at its source; it is linked, not copied ([Event images](?page=sources#event-images)) |
 | `location` | `{ "name": …, "address": … }` |
 | `price` | `{ "free": true }`, `{ "free": false, "amount": 8 }`; **if omitted, the event is free**; `{ "free": false }` alone means unknown |
 | `ticketRequired`, `registrationRequired`, `familyFriendly`, `cancelled` | optional, default `false` |
