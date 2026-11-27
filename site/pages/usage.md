@@ -13,6 +13,11 @@ Below the header, the toolbar summarises what is shown:
 
 - The arrows step through the selected period; the date opens the native
   date picker.
+- Swiping the list does the same: swipe left for the next day, weekend or
+  seven days, swipe right for the previous one. On a keyboard, the left and
+  right arrow keys work too. While a search is active, the list covers all
+  dates, so swiping and the arrows do nothing. See
+  [Swiping](?page=usage#swiping).
 - The calendar starts on today and never shows earlier days.
 - The date label always shows weekday and date (for example "Sa, 21.11." or
   "21.–27.11."), so its width stays the same while paging.
@@ -89,6 +94,23 @@ Tapping an event opens its details with a shareable URL (`/#<event-id>`):
 - a link to the event's place, if it has one ([Places](?page=places)).
 
 Addresses in descriptions become map links. External links open in a new tab.
+
+The buttons ‹ and › next to the star open the previous and next event;
+swiping left (next) and right (previous) or the left and right arrow keys do
+the same. The order is that of the view the event was opened from: the list
+with the active filters and search, continuing past the selected period;
+"Gemerkt"; or the place page. An event opened from a shared link pages
+through all upcoming events. Paging replaces the URL instead of adding a
+history entry, so "Zurück" still returns to the list.
+
+### Swiping
+
+Swiping works in the list and in the event details, as described above. It
+reacts only to mainly horizontal movements, so scrolling is unaffected.
+Touches that start right at the screen edge are left to the system's back
+gesture. Pinch-zoom keeps working; while zoomed in, a horizontal swipe moves
+the zoomed page instead of paging. With "reduce motion" set on the device,
+the content changes without sliding.
 
 > **Note:** the map loads tiles from `tile.openstreetmap.org`, which receives
 > the visitor's IP address. Mention this in the instance's privacy policy.
