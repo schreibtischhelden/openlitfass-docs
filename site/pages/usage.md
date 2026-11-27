@@ -76,9 +76,13 @@ Tapping an event opens its details with a shareable URL (`/#<event-id>`):
 
 - description, time, place, price, organiser and source ("Quelle: …"; with
   several sources "Quellen: A, B");
+- the event image from the source, if the source provides one
+  ([Event images](?page=sources#event-images)): by default a button "Bild
+  von … laden" (load image from …), loaded only after a click;
 - a map link (OpenStreetMap) and, when coordinates are known, a "Karte
   anzeigen" (show map) button. Map tiles are loaded only after a click, as
-  plain images without cookies, no iframe and no map library;
+  plain images without cookies, no iframe and no map library. Both can be
+  set to load always or never in the [settings](?page=settings);
 - "In Kalender" downloads the event as an `.ics` file;
 - "Teilen" opens the system share sheet on mobile devices (Web Share API,
   only over HTTPS) or copies the link;
@@ -113,8 +117,17 @@ issue trackers, the legal notice and the privacy policy. All of it comes from
 
 Without a choice, the system setting applies. The moon/sun switch in the
 header sets the scheme and remembers it in the browser. If the choice matches
-the system setting again, it is cleared and the page follows the system once
-more.
+the system setting again, the page follows the system once more. The same
+choice is in the settings.
+
+## Settings
+
+"Einstellungen" (settings, in the footer, `/#einstellungen`) holds what a
+visitor can choose on their device: colour scheme, and whether maps and event
+images from other servers load after a click, always or never. It also lists
+everything the calendar has stored in the browser and deletes it. Nothing
+leaves the device and no cookies are used. Details: [Settings on the
+device](?page=settings).
 
 ## Install and offline use
 

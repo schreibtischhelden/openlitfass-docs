@@ -81,6 +81,7 @@ date.
 | `category` | category, translated with `categoryMap` ([Categories](?page=categories)) |
 | `organizer` | organiser |
 | `url` | link to the event |
+| `image` | URL of the event image; kept only with `"images": true` on the source ([Event images](?page=sources#event-images)) |
 | `locationName`, `locationAddress` | venue and address |
 | `placeRef` | place reference for sources with several venues ([Places](?page=places)) |
 | `start`, `end` | timestamps with `format` (recommended) |

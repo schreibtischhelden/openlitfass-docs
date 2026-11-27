@@ -40,7 +40,9 @@ addresses.
 - **`termine/index.html`:** all upcoming events, grouped by day.
 - **`termine/<id>.html`:** one page per event with title, description, Open
   Graph tags and a schema.org `Event` as JSON-LD, including the cancelled
-  status. Its share button shares this address, so messengers show a
+  status. If the event has an [image](?page=sources#event-images),
+  `og:image`, `twitter:image` (with `summary_large_image`) and the JSON-LD
+  point to it at the source; the image is never copied. Its share button shares this address, so messengers show a
   preview.
 - **`orte/index.html`** and **`orte/<id>.html`:** the places, with a
   schema.org `Place` and their upcoming events (only with `places.json`).
