@@ -4,7 +4,9 @@ An instance is configured by files in its directory and, when it runs as a
 container, by environment variables. This page lists every setting.
 
 The [config UI](https://config.openlitfass.org) builds the JSON files with
-forms in the browser and can import an existing file to change it.
+forms in the browser and can import an existing file to change it. It can
+also load a whole instance, from its folder, a ZIP or a public git repository
+(GitHub, Codeberg, GitLab, Forgejo or Gitea), and give it back as a ZIP.
 
 | File | Purpose | Page |
 |---|---|---|
