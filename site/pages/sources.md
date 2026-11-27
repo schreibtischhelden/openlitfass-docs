@@ -211,7 +211,7 @@ next source that has one.
 > **Note:** some messengers (for example WhatsApp and iMessage) build link
 > previews on the sharing person's device, which then requests the image from
 > the source's server. Mention this in the privacy policy (the example
-> instance's `site/datenschutz.html` has a template).
+> instance's `site/pages/datenschutz.md` has a template).
 
 ## Health status
 
