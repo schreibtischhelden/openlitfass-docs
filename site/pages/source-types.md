@@ -34,9 +34,9 @@ WordPress event plugins (Events Manager `/events.ics`, The Events Calendar
 | `DESCRIPTION` | `description` (cleaned, truncated) |
 | `URL` | `url` |
 | first value of `CATEGORIES` | `category` (translate with `categoryMap`) |
-| `ORGANIZER;CN=…` | `organizer`, otherwise `organizer` from the file |
+| `ORGANIZER;CN=…` or a plain name as the value | `organizer`, otherwise `organizer` from the file |
 | `X-APPLE-STRUCTURED-LOCATION` (`X-TITLE`, `X-ADDRESS`) | location name and address |
-| otherwise `LOCATION` | location name, otherwise `locationDefault` |
+| otherwise `LOCATION` | location name (address too for multi-part values, see below), otherwise `locationDefault` |
 | `UID` (plus the date for recurrences) | stable ID |
 | `STATUS:CANCELLED` | `cancelled` |
 | – | price unknown (iCalendar has no price) |
@@ -47,6 +47,23 @@ events (`VALUE=DATE`); `DURATION` instead of `DTEND`. If the end equals the
 start (Events Manager does this when no end time is set), the end time is
 left empty. Unknown zone names, such as Windows names, fall back to the
 instance's time zone.
+
+**Times marked as UTC by mistake:** some exporters write local times with a
+`Z` after subtracting a fixed offset, regardless of daylight saving time
+(for example kirche-mv.de: 10:00 in October becomes `T090000Z`, so summer
+events would be shown an hour late). `"icalUTCAs": "+01:00"` reads such
+times as UTC+1 wall-clock times in the calendar's time zone; `"local"` simply
+ignores the `Z`. Leave it unset for correct feeds. Check a summer and a
+winter event against the website before setting it.
+
+**Broken exports:** besides the standard, the parser accepts some common
+exporter errors. In files with CRLF line endings, a bare line feed inside a
+value counts as a line wrap (joined with a space), and a bare line feed
+followed by a tab separates parts of a `LOCATION`: the first part becomes the
+location name, the others the address (list markers such as `*` removed).
+`\"` is read as `"`. Files with LF line endings only are read strictly by the
+standard. Titles that an exporter glues together from title and subtitle
+without a separator can't be split again; ask the site to fix its export.
 
 **Recurrences (`RRULE`):** `DAILY`, `WEEKLY` (also with `BYDAY=TU,TH`),
 `MONTHLY` (same day of the month) and `YEARLY`, each with `INTERVAL`, `COUNT`

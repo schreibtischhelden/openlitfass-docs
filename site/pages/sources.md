@@ -73,6 +73,7 @@ A complete iCalendar source needs only a few lines:
 | `familyFriendly` | `false` | mark every event as family-friendly (`ical`, `wcs`) |
 | `organizer` | – | organiser for every event (`wcs`; `ical` if `ORGANIZER` is missing) |
 | `locationDefault` | – | venue for events without one (`wcs`, `ical`) |
+| `icalUTCAs` | – | `ical` only: read wrong UTC times as `"+01:00"` or `"local"` ([details](?page=source-types#icalendar)) |
 | `status` | written by the pipeline | [Health status](#health-status); do not edit |
 
 Type-specific fields (`itemsPath`, `nextPath`, `itemSelector`, `extract`,

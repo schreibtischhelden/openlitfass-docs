@@ -81,6 +81,7 @@ type-specific ones in [Source types](?page=source-types).
 | `familyFriendly` | `ical`, `wcs` | every event is family-friendly |
 | `organizer` | `ical`, `wcs` | organiser if the source has none |
 | `locationDefault` | `ical`, `wcs` | `"Venue, Street 1, 12345 City"` |
+| `icalUTCAs` | `ical` | `"+01:00"` or `"local"` for exporters that mark local times as UTC |
 | `itemsPath` | `json` | dot path to the array of items |
 | `nextPath` | `json` | dot path to the next page's URL |
 | `maxPages` | `json` | page limit, default `10` |
