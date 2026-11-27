@@ -49,6 +49,13 @@ start (Events Manager does this when no end time is set), the end time is
 left empty. Unknown zone names, such as Windows names, fall back to the
 instance's time zone.
 
+**Events over several days** (an exhibition from 2 October to 31 December, a
+weekend festival) appear once per day while they run, within the fetch
+window. The first day keeps the start time, the following days are
+all-day. Each day gets its own ID (`UID` plus the date). Timed events
+shorter than 24 hours, such as a party from 22:00 to 03:00, stay one event
+on their start day.
+
 **Times marked as UTC by mistake:** some exporters write local times with a
 `Z` after subtracting a fixed offset, regardless of daylight saving time
 (for example kirche-mv.de: 10:00 in October becomes `T090000Z`, so summer
