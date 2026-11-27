@@ -40,7 +40,8 @@ public files of the built site, for example `https://weissens.ee/data/events.jso
 | `generatedAt` | time of the run; ignored by the front end |
 | `id` | stable ID ([Event IDs](?page=architecture#event-ids)) |
 | `title`, `description` | text; the description keeps its paragraphs |
-| `category` | a category name ([Categories](?page=categories)) |
+| `category` | the main category ([Categories](?page=categories)) |
+| `categories` | optional: every category of the event, translated with `categoryMap` ([several categories](?page=categories#several-categories-per-event)) |
 | `date` | `YYYY-MM-DD`, in the instance's time zone |
 | `startTime`, `endTime` | `HH:MM`, in the instance's time zone; empty start time = all-day |
 | `location` | `name`, `address`, optionally `lat` and `lng` |

@@ -36,12 +36,16 @@ end uses only the Go standard library.
 
 1. Load and check `categories.json`; stop if it is invalid.
 2. Load every source file in `sources/` (alphabetical order) and the inbox.
-   A file with invalid JSON is skipped.
-3. Fetch every source with its own timeout (20 seconds) and map its items to
-   events.
-4. Apply the common filters: `categoryMap`, `categoryRules`, `categories`,
-   `include`, `exclude`, `daysAhead`, `place`; drop past events.
-5. Write each source's `status` back into its file.
+   A file with invalid JSON is skipped. Sources with `requestDelaySeconds`
+   are fetched last, after the inbox.
+3. Fetch the sources one after another, each with its own timeout (20
+   seconds), and map their items to events.
+4. Apply the common filters: `categorySeparator`, `categoryFilter`,
+   `categoryAttributes`, `categoryMap`, `categoryRules`, `categories`,
+   `include`, `exclude`, `daysAhead`, `place`; drop past events
+   ([order](?page=categories#order-of-processing)).
+5. Write each source's `status` back into its file; set `familyFriendly`
+   from `categories.json`.
 6. Validate: drop events without a title or with an implausible date.
 7. Merge the same event from several sources; assign stable IDs; sort by
    date and time.
@@ -56,7 +60,10 @@ diff of a run shows only real changes.
 Every source is wrapped in the same layers:
 
 - **Timeout** per source (20 seconds, at most 180 with `timeoutSeconds`), so
-  a hanging server does not use up the time of the others. The whole run has an outer limit of five minutes.
+  a hanging server does not use up the time of the others. A source with
+  `requestDelaySeconds` gets the timeout per request instead and runs last,
+  so it only uses time the others left. The whole run has an outer limit,
+  five minutes by default (`fetchTimeoutMinutes` in `instance.json`).
 - **Panic recovery:** a crash inside a source, for example caused by
   unexpected data, becomes an error of that source.
 - **Common filters** as described above.

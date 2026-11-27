@@ -337,8 +337,28 @@ the others are kept. `maxRequests` (default 20) caps the requests of one run;
 the rest is skipped with a log line.
 
 Slow endpoints can get more time with `timeoutSeconds` (default 20, at most
-180; the whole run has five minutes). Keep the number of requests small: every
-run repeats all of them, and each one costs the site's server work too.
+180; the whole run has `fetchTimeoutMinutes`, default five). Keep the number
+of requests small: every run repeats all of them, and each one costs the
+site's server work too.
+
+### Request pacing
+
+Some sites ask crawlers to wait between requests, for example with
+`Crawl-delay: 5` in their `robots.txt`. `requestDelaySeconds` honours that:
+
+```json
+"requestDelaySeconds": 5,
+"timeoutSeconds": 180
+```
+
+- The delay is the minimum time between the **starts** of two requests
+  (steps and `forEach` requests). A request that took longer is followed
+  without extra wait.
+- `timeoutSeconds` then limits **each request**, not the whole source.
+- Paced sources run **last**, after all other sources and the inbox, so they
+  only use the time the others left. The whole source is bounded by the run's
+  limit (`fetchTimeoutMinutes` in [instance.json](?page=configuration#instancejson)).
+  If it runs out, the events of the finished requests are kept.
 
 ## Presets
 
@@ -383,11 +403,30 @@ of Mecklenburg-Western Pomerania. The parameters are in the widget URL
 | `language` | no, default `de` | `de` |
 
 The preset reads the event IDs from the widget page for `daysAhead` (default
-14) and loads the entries in batches of 100. The widget renders uncached
-entries slowly (about half a second each), so the preset allows 180 seconds;
-keep `daysAhead` as small as the calendar needs. The category is the first
-one the widget lists; map it with `categoryMap`. Check with the operator of
-the widget whether you may reuse its events.
+14) and loads the entries in batches of 100. The widget's `robots.txt` asks
+for a crawl delay of 5 seconds, so the preset waits 5 seconds between
+requests ([request pacing](#request-pacing)). It renders uncached entries
+slowly (a batch can take about 18 seconds), so each request may take 180
+seconds; keep `daysAhead` as small as the calendar needs. Check with the
+operator of the widget whether you may reuse its events.
+
+The widget lists several categories per event, alphabetically ("Ausstellung,
+Führungen & Touren"). The preset keeps all of them
+(`"categorySeparator": ", "`) and marks events with the category "Kinder" as
+family-friendly. Map them with `categoryMap` and filter with
+`categoryFilter` ([Categories](?page=categories#filtering-by-category)), for
+example to drop exhibitions but keep guided tours of them.
+
+Widgets with a wide radius list events of neighbouring towns too. The info
+line ends in "Venue, Town", which becomes the location name, so a town filter
+is an `include` rule that matches only the end of it:
+
+```json
+"include": [{ "field": "location", "regex": "(?i),\\s*Stralsund\\s*$" }]
+```
+
+Long-running exhibitions appear once per opening day; see
+[issue #63](https://github.com/schreibtischhelden/openlitfass/issues/63).
 
 ## Time zones
 

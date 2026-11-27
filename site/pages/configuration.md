@@ -51,6 +51,7 @@ forms in the browser and can import an existing file to change it.
 | `privacyUrl` | – | privacy policy; absolute URL or a page in `site/` |
 | `submitUrl` | – | where people report a missing event ("Termin melden"): a form or a `mailto:` link |
 | `issuesUrl` | – | the instance's own issue tracker for wrong events, missing sources or places |
+| `fetchTimeoutMinutes` | `5` | time limit of a whole fetch run; the sources run one after another, so raise it for many or paced (`requestDelaySeconds`) sources |
 
 The About page always links the openLitfass issue tracker for problems with
 the software. `issuesUrl` adds the instance's tracker for problems with its
@@ -74,10 +75,13 @@ type-specific ones in [Source types](?page=source-types).
 | `priority` | all | merge priority, default `0` |
 | `disabled` | all | skip the source |
 | `daysAhead` | all | time window in days |
+| `categorySeparator` | all | split the source's category value into [several categories](?page=categories#several-categories-per-event) |
+| `categoryFilter` | all | `{ "deny", "allow", "include", "exclude" }`, by the source's category names ([details](?page=categories#filtering-by-category)) |
+| `categoryAttributes` | all | `{ "Kinder": { "familyFriendly": true } }`, attributes by source category |
 | `categoryMap` | all | source category → instance category |
 | `categoryRules` | all | `[{ "field": …, "regex": …, "category": … }]`, first match wins |
-| `categories` | all | category allowlist |
-| `include`, `exclude` | all | `[{ "field": …, "regex": … }]` |
+| `categories` | all | deprecated: category allowlist, use `categoryFilter` |
+| `include`, `exclude` | all | `[{ "field": …, "regex": … }]`; the field `category` is deprecated |
 | `place` | all | place `id` or ref for every event |
 | `familyFriendly` | `ical`, `wcs` | every event is family-friendly |
 | `organizer` | `ical`, `wcs` | organiser if the source has none |
@@ -89,7 +93,8 @@ type-specific ones in [Source types](?page=source-types).
 | `steps` | all but `wcs` | [requests before the main one](?page=source-types#steps) that collect variables |
 | `forEach` | all but `wcs` | repeat the main request per value or batch |
 | `maxRequests` | all but `wcs` | request limit for `forEach`, default `20` |
-| `timeoutSeconds` | all | time limit of the source, default `20`, at most `180` |
+| `timeoutSeconds` | all | time limit of the source, default `20`, at most `180`; per request with `requestDelaySeconds` |
+| `requestDelaySeconds` | all but `wcs` | [minimum time between requests](?page=source-types#request-pacing) of a source with `steps` or `forEach` |
 | `itemSelector` | `html` | CSS selector of one event |
 | `sectionSelector` | `html` | headings that group events |
 | `extract` | `html` | named values per event |

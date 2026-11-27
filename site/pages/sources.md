@@ -66,9 +66,12 @@ A complete iCalendar source needs only a few lines:
 | `priority` | `0` | which version wins when sources overlap ([Merging](#the-same-event-from-several-sources)) |
 | `disabled` | `false` | `true` skips the source without deleting the file |
 | `daysAhead` | – | keep only events up to N days ahead |
+| `categorySeparator` | – | split the source's category value into several categories ([Categories](?page=categories#several-categories-per-event)) |
+| `categoryFilter` | – | drop events or categories by the source's category names ([Categories](?page=categories#filtering-by-category)) |
+| `categoryAttributes` | – | set attributes such as `familyFriendly` by source category |
 | `categoryMap` | – | translate the source's categories to the instance's |
 | `categoryRules` | – | set the category by regular expression ([Categories](?page=categories#splitting-a-coarse-category)) |
-| `categories` | – | keep only these categories |
+| `categories` | – | deprecated: keep only these categories; use `categoryFilter` |
 | `include`, `exclude` | – | keep or drop events by regular expression |
 | `place` | – | link every event to one place of `places.json` |
 | `familyFriendly` | `false` | mark every event as family-friendly (`ical`, `wcs`) |
@@ -89,8 +92,8 @@ Filters apply after fetching and mapping, the same way for every source type.
 ```json
 {
   "daysAhead": 30,
+  "categoryFilter": { "deny": ["Sport"] },
   "categoryMap": { "Kino": "Kultur", "Lesung": "Kultur" },
-  "categories": ["Kultur", "Markt"],
   "include": [{ "field": "location", "regex": "(?i)weißensee|1308[68]" }],
   "exclude": [{ "field": "title", "regex": "(?i)geschlossene gesellschaft" }]
 }
@@ -108,11 +111,16 @@ Filters apply after fetching and mapping, the same way for every source type.
 - **`categoryRules`** sets the category from the title or another field,
   after `categoryMap`. See
   [Splitting a coarse category](?page=categories#splitting-a-coarse-category).
-- **`categories`** is an allowlist, applied after `categoryMap` and
-  `categoryRules`.
+- **`categoryFilter`** drops events by the source's own category names
+  (`deny`, with exceptions in `allow`) and decides which categories an event
+  keeps (`include`, `exclude`), before `categoryMap`. See
+  [Filtering by category](?page=categories#filtering-by-category).
+- **`categories`** (deprecated, use `categoryFilter`) is an allowlist for the
+  main category, applied after `categoryMap` and `categoryRules`.
 - **`include`** keeps only events where at least one rule matches;
   **`exclude`** drops events where any rule matches. Fields: `title`,
-  `location` (name and address), `organizer`, `category`, `description`.
+  `location` (name and address), `organizer`, `description` and
+  (deprecated, use `categoryFilter`) `category`.
   Regular expressions use Go syntax; `(?i)` makes them case-insensitive.
   Invalid rules are logged and skipped.
 - **Past events are always dropped.** This is not configurable.
