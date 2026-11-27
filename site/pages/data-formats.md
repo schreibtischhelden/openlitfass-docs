@@ -22,6 +22,7 @@ public files of the built site, for example `https://weissens.ee/data/events.jso
       "price": { "free": true, "amount": null },
       "organizer": "Kiezinitiative",
       "url": "https://example.org/flohmarkt",
+      "image": "https://example.org/img/flohmarkt.jpg",
       "source": "kiezkalender",
       "sources": ["kiezkalender"],
       "ticketRequired": false,
@@ -45,6 +46,7 @@ public files of the built site, for example `https://weissens.ee/data/events.jso
 | `location` | `name`, `address`, optionally `lat` and `lng` |
 | `price` | `free` and `amount` in euros; `free: false` with `amount: null` = unknown |
 | `organizer`, `url` | optional |
+| `image` | optional `https` URL of the image at the source (only for sources with `"images": true`) |
 | `source` | the source whose version is shown |
 | `sources` | all contributing sources, the shown one first |
 | `ticketRequired`, `registrationRequired`, `familyFriendly`, `cancelled` | always set |

@@ -73,6 +73,7 @@ A complete iCalendar source needs only a few lines:
 | `familyFriendly` | `false` | mark every event as family-friendly (`ical`, `wcs`) |
 | `organizer` | – | organiser for every event (`wcs`; `ical` if `ORGANIZER` is missing) |
 | `locationDefault` | – | venue for events without one (`wcs`, `ical`) |
+| `images` | `false` | keep the event images the source provides ([Event images](#event-images)) |
 | `status` | written by the pipeline | [Health status](#health-status); do not edit |
 
 Type-specific fields (`itemsPath`, `nextPath`, `itemSelector`, `extract`,
@@ -162,6 +163,41 @@ separator, brackets or capital letters at the start, so "Abgesagt – ein
 Theaterstück" stays an ordinary title. A postponed event counts as cancelled
 on its original date. Notes such as "ausverkauft" (sold out) or
 "Zusatztermin" (additional date) are deliberately ignored.
+
+## Event images
+
+Many sources publish an image per event. openLitfass never copies such an
+image; it only keeps its URL and references it:
+
+- static event pages name it in `og:image` and `twitter:image`, so link
+  previews in messengers show it ([Static pages and SEO](?page=seo));
+- the app and the static pages show it only as far as the visitor's
+  [image setting](?page=settings) allows: after a click (default), always or
+  never.
+
+Images are **off by default**, because their licence varies. Turn them on per
+source only where the source allows the use:
+
+```json
+{
+  "type": "ical",
+  "url": "https://example.org/events.ics",
+  "images": true
+}
+```
+
+Where the image comes from: `IMAGE` or `ATTACH` in [iCalendar](?page=source-types#icalendar),
+the `image` rule in the [mapping](?page=field-mapping#target-fields) for `rss`,
+`json` and `html` (in RSS, for example, `enclosure@url`), and the `image`
+field in [inbox files](?page=inbox) (always kept). Only absolute `https`
+URLs are kept; anything else is dropped silently. When several sources report
+the same event, the image comes from the shown version, otherwise from the
+next source that has one.
+
+> **Note:** some messengers (for example WhatsApp and iMessage) build link
+> previews on the sharing person's device, which then requests the image from
+> the source's server. Mention this in the privacy policy (the example
+> instance's `site/datenschutz.html` has a template).
 
 ## Health status
 

@@ -39,6 +39,7 @@ WordPress event plugins (Events Manager `/events.ics`, The Events Calendar
 | otherwise `LOCATION` | location name, otherwise `locationDefault` |
 | `UID` (plus the date for recurrences) | stable ID |
 | `STATUS:CANCELLED` | `cancelled` |
+| `IMAGE` (URI), otherwise `ATTACH` with an `image/…` `FMTTYPE` | `image`, only with `"images": true`; inline (base64) images are skipped |
 | – | price unknown (iCalendar has no price) |
 
 **Times:** UTC (`…Z`), `TZID=…` and "floating" times without a zone (then the
@@ -61,6 +62,10 @@ log line.
 For RSS feeds. `path` in the mapping is the lower-case tag name, without
 namespace, of a child element of `<item>`: `title`, `link`, `description`,
 `pubdate`, `guid`, `category`, and any custom tag of the feed.
+Attributes are available as `<tag>@<attribute>`, for example `enclosure@url`
+or `content@url` (`media:content`); an image is mapped with
+`"image": { "path": "enclosure@url" }`. If a tag occurs several times, add
+the index: `enclosure@url.0`.
 
 ```json
 {
