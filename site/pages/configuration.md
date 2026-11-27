@@ -75,6 +75,7 @@ type-specific ones in [Source types](?page=source-types).
 | `disabled` | all | skip the source |
 | `daysAhead` | all | time window in days |
 | `categoryMap` | all | source category → instance category |
+| `categoryRules` | all | `[{ "field": …, "regex": …, "category": … }]`, first match wins |
 | `categories` | all | category allowlist |
 | `include`, `exclude` | all | `[{ "field": …, "regex": … }]` |
 | `place` | all | place `id` or ref for every event |

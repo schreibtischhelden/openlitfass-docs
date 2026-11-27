@@ -39,8 +39,8 @@ end uses only the Go standard library.
    A file with invalid JSON is skipped.
 3. Fetch every source with its own timeout (20 seconds) and map its items to
    events.
-4. Apply the common filters: `categoryMap`, `categories`, `include`,
-   `exclude`, `daysAhead`, `place`; drop past events.
+4. Apply the common filters: `categoryMap`, `categoryRules`, `categories`,
+   `include`, `exclude`, `daysAhead`, `place`; drop past events.
 5. Write each source's `status` back into its file.
 6. Validate: drop events without a title or with an implausible date.
 7. Merge the same event from several sources; assign stable IDs; sort by

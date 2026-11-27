@@ -67,6 +67,7 @@ A complete iCalendar source needs only a few lines:
 | `disabled` | `false` | `true` skips the source without deleting the file |
 | `daysAhead` | – | keep only events up to N days ahead |
 | `categoryMap` | – | translate the source's categories to the instance's |
+| `categoryRules` | – | set the category by regular expression ([Categories](?page=categories#splitting-a-coarse-category)) |
 | `categories` | – | keep only these categories |
 | `include`, `exclude` | – | keep or drop events by regular expression |
 | `place` | – | link every event to one place of `places.json` |
@@ -104,7 +105,11 @@ Filters apply after fetching and mapping, the same way for every source type.
   instance's vocabulary from `categories.json`. Keys are matched
   case-insensitively; unmapped values are kept as they are. See
   [Categories](?page=categories).
-- **`categories`** is an allowlist, applied after `categoryMap`.
+- **`categoryRules`** sets the category from the title or another field,
+  after `categoryMap`. See
+  [Splitting a coarse category](?page=categories#splitting-a-coarse-category).
+- **`categories`** is an allowlist, applied after `categoryMap` and
+  `categoryRules`.
 - **`include`** keeps only events where at least one rule matches;
   **`exclude`** drops events where any rule matches. Fields: `title`,
   `location` (name and address), `organizer`, `category`, `description`.
