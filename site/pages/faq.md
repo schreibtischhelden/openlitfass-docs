@@ -19,7 +19,9 @@ in the core ([Development](?page=development#a-source-with-custom-go-code)).
 No. The [config UI](https://config.openlitfass.org) builds `instance.json`,
 `categories.json`, `places.json`, inbox events and source files with forms in
 the browser. Nothing is sent to a server; download the file and put it into
-the instance directory.
+the instance directory. To edit an existing instance as a whole, load its
+folder, a ZIP or its public git repository on the start page and download
+the changed files as a ZIP; changes are not written back to the repository.
 
 ## Why is every source a file of its own?
 
