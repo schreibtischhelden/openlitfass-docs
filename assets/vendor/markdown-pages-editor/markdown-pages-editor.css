@@ -1,0 +1,164 @@
+/*! markdown-pages-editor - https://github.com/schreibtischhelden/markdown-pages-editor - MIT License */
+/* Layout of the Markdown editor.
+   Colours follow Pico CSS variables when they exist and fall back to the
+   surrounding text colour, so the editor also fits sites without Pico.
+   Override the --markdown-pages-editor-* variables to adapt it. */
+
+.markdown-pages-editor {
+	--markdown-pages-editor-border: var(--pico-muted-border-color, color-mix(in srgb, currentColor 22%, transparent));
+	--markdown-pages-editor-background: var(--pico-background-color, transparent);
+	--markdown-pages-editor-toolbar-background: var(--pico-card-sectioning-background-color, color-mix(in srgb, currentColor 5%, transparent));
+	--markdown-pages-editor-active: var(--pico-primary-background, color-mix(in srgb, currentColor 18%, transparent));
+	--markdown-pages-editor-active-text: var(--pico-primary-inverse, inherit);
+	--markdown-pages-editor-height: 24rem;
+	--markdown-pages-editor-radius: var(--pico-border-radius, 0.25rem);
+
+	border: 1px solid var(--markdown-pages-editor-border);
+	border-radius: var(--markdown-pages-editor-radius);
+	background: var(--markdown-pages-editor-background);
+	margin-bottom: var(--pico-spacing, 1rem);
+	overflow: hidden;
+}
+
+.markdown-pages-editor-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem 0.75rem;
+	padding: 0.35rem;
+	border-bottom: 1px solid var(--markdown-pages-editor-border);
+	background: var(--markdown-pages-editor-toolbar-background);
+}
+
+.markdown-pages-editor-format,
+.markdown-pages-editor-modes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.15rem;
+}
+
+.markdown-pages-editor-modes {
+	margin-left: auto;
+}
+
+.markdown-pages-editor-toolbar button {
+	/* undo Pico's large form controls */
+	width: auto;
+	margin: 0;
+	min-width: 2rem;
+	padding: 0.2rem 0.5rem;
+	border: 1px solid transparent;
+	border-radius: var(--markdown-pages-editor-radius);
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-size: 0.875rem;
+	line-height: 1.4;
+	cursor: pointer;
+	box-shadow: none;
+}
+
+.markdown-pages-editor-toolbar button:hover:not(:disabled),
+.markdown-pages-editor-toolbar button:focus-visible {
+	border-color: var(--markdown-pages-editor-border);
+}
+
+.markdown-pages-editor-separator {
+	width: 1px;
+	margin: 0.15rem 0.25rem;
+	background: var(--markdown-pages-editor-border);
+}
+
+.markdown-pages-editor-toolbar button:disabled {
+	opacity: 0.4;
+	cursor: default;
+}
+
+.markdown-pages-editor-toolbar button[aria-pressed="true"] {
+	background: var(--markdown-pages-editor-active);
+	color: var(--markdown-pages-editor-active-text);
+}
+
+.markdown-pages-editor-bold { font-weight: 700; }
+.markdown-pages-editor-italic { font-style: italic; }
+.markdown-pages-editor-strikethrough { text-decoration: line-through; }
+.markdown-pages-editor-code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+
+.markdown-pages-editor-download {
+	border-color: var(--markdown-pages-editor-border) !important;
+}
+
+.markdown-pages-editor-panes {
+	display: grid;
+	grid-template-columns: 1fr;
+	min-height: var(--markdown-pages-editor-height);
+}
+
+.markdown-pages-editor[data-mode="split"] .markdown-pages-editor-panes {
+	grid-template-columns: 1fr 1fr;
+}
+
+.markdown-pages-editor .markdown-pages-editor-input {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	min-height: var(--markdown-pages-editor-height);
+	margin: 0;
+	padding: 0.75rem;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	color: inherit;
+	font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+	font-size: 0.9rem;
+	line-height: 1.5;
+	resize: vertical;
+	box-shadow: none;
+	tab-size: 4;
+}
+
+.markdown-pages-editor .markdown-pages-editor-input:focus {
+	outline: 2px solid var(--markdown-pages-editor-active);
+	outline-offset: -2px;
+}
+
+.markdown-pages-editor-preview {
+	box-sizing: border-box;
+	min-width: 0;
+	max-height: calc(var(--markdown-pages-editor-height) * 2);
+	padding: 0.75rem 1rem;
+	overflow: auto;
+}
+
+.markdown-pages-editor[data-mode="split"] .markdown-pages-editor-preview {
+	border-left: 1px solid var(--markdown-pages-editor-border);
+}
+
+.markdown-pages-editor-preview > :first-child { margin-top: 0; }
+.markdown-pages-editor-preview > :last-child { margin-bottom: 0; }
+
+.markdown-pages-editor-empty {
+	opacity: 0.6;
+	font-style: italic;
+}
+
+.markdown-pages-editor [hidden] {
+	display: none !important;
+}
+
+/* narrow screens: preview below the text */
+@media (max-width: 720px) {
+	.markdown-pages-editor[data-mode="split"] .markdown-pages-editor-panes {
+		grid-template-columns: 1fr;
+	}
+
+	.markdown-pages-editor[data-mode="split"] .markdown-pages-editor-preview {
+		border-left: 0;
+		border-top: 1px solid var(--markdown-pages-editor-border);
+	}
+
+	.markdown-pages-editor-modes {
+		margin-left: 0;
+	}
+}

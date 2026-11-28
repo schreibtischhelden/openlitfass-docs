@@ -1,0 +1,438 @@
+# Source types
+
+Every source file has a `type`. Prefer them in this order: a source with a
+standard format (`ical`) needs no mapping and breaks least; `rss` and `json`
+need a [field mapping](?page=field-mapping); `html` reads the page layout and
+breaks when the layout changes. Templates for every type are in the example
+instance's `sources/` directory.
+
+For platforms that many sites share, the core ships [presets](#presets): the
+source file then only names the preset and a few parameters. Listings that
+need more than one request use [steps](#steps).
+
+## iCalendar
+
+For calendar exports from Google Calendar, Nextcloud, Outlook and most
+WordPress event plugins (Events Manager `/events.ics`, The Events Calendar
+`?ical=1`, …). No mapping is needed; the fields are defined by the standard.
+
+```json
+{
+  "type": "ical",
+  "url": "https://example.org/events.ics",
+  "daysAhead": 120,
+  "organizer": "Beispiel-Bühne",
+  "locationDefault": "Beispiel-Bühne, Musterstraße 5, 12345 Berlin",
+  "categoryMap": { "Konzert": "Kultur" },
+  "familyFriendly": false
+}
+```
+
+| iCalendar | Event field |
+|---|---|
+| `SUMMARY` | `title` |
+| `DESCRIPTION` | `description` (cleaned, truncated) |
+| `URL` | `url` |
+| first value of `CATEGORIES` | `category` (translate with `categoryMap`) |
+| `ORGANIZER;CN=…` or a plain name as the value | `organizer`, otherwise `organizer` from the file |
+| `X-APPLE-STRUCTURED-LOCATION` (`X-TITLE`, `X-ADDRESS`) | location name and address |
+| otherwise `LOCATION` | location name (address too for multi-part values, see below), otherwise `locationDefault` |
+| `UID` (plus the date for recurrences) | stable ID |
+| `STATUS:CANCELLED` | `cancelled` |
+| `IMAGE` (URI), otherwise `ATTACH` with an `image/…` `FMTTYPE` | `image`, only with `"images": true`; inline (base64) images are skipped |
+| – | price unknown (iCalendar has no price) |
+
+**Times:** UTC (`…Z`), `TZID=…` and "floating" times without a zone (then the
+calendar's `X-WR-TIMEZONE`, otherwise the instance's time zone); all-day
+events (`VALUE=DATE`); `DURATION` instead of `DTEND`. If the end equals the
+start (Events Manager does this when no end time is set), the end time is
+left empty. Unknown zone names, such as Windows names, fall back to the
+instance's time zone.
+
+**Events over several days** (an exhibition from 2 October to 31 December, a
+weekend festival) appear once per day while they run, within the fetch
+window. The first day keeps the start time, the following days are
+all-day. Each day gets its own ID (`UID` plus the date). Timed events
+shorter than 24 hours, such as a party from 22:00 to 03:00, stay one event
+on their start day.
+
+**Times marked as UTC by mistake:** some exporters write local times with a
+`Z` after subtracting a fixed offset, regardless of daylight saving time
+(for example kirche-mv.de: 10:00 in October becomes `T090000Z`, so summer
+events would be shown an hour late). `"icalUTCAs": "+01:00"` reads such
+times as UTC+1 wall-clock times in the calendar's time zone; `"local"` simply
+ignores the `Z`. Leave it unset for correct feeds. Check a summer and a
+winter event against the website before setting it.
+
+**Broken exports:** besides the standard, the parser accepts some common
+exporter errors. In files with CRLF line endings, a bare line feed inside a
+value counts as a line wrap (joined with a space), and a bare line feed
+followed by a tab separates parts of a `LOCATION`: the first part becomes the
+location name, the others the address (list markers such as `*` removed).
+`\"` is read as `"`. Files with LF line endings only are read strictly by the
+standard. Titles that an exporter glues together from title and subtitle
+without a separator can't be split again; ask the site to fix its export.
+
+**Recurrences (`RRULE`):** `DAILY`, `WEEKLY` (also with `BYDAY=TU,TH`),
+`MONTHLY` (same day of the month) and `YEARLY`, each with `INTERVAL`, `COUNT`
+and `UNTIL`; `EXDATE` and modified single occurrences (`RECURRENCE-ID`) are
+supported. Recurrences are expanded only within `daysAhead` (default 180
+days, at most 500 occurrences). Unsupported rules, such as "every first
+Monday" (`MONTHLY` with `BYDAY=1MO`), yield only the first occurrence and a
+log line.
+
+## RSS
+
+For RSS feeds. `path` in the mapping is the lower-case tag name, without
+namespace, of a child element of `<item>`: `title`, `link`, `description`,
+`pubdate`, `guid`, `category`, and any custom tag of the feed.
+Attributes are available as `<tag>@<attribute>`, for example `enclosure@url`
+or `content@url` (`media:content`); an image is mapped with
+`"image": { "path": "enclosure@url" }`. If a tag occurs several times, add
+the index: `enclosure@url.0`.
+
+```json
+{
+  "type": "rss",
+  "url": "https://example.org/events/feed",
+  "mapping": {
+    "sourceId": { "path": "guid" },
+    "title": { "path": "title" },
+    "description": { "path": "description" },
+    "url": { "path": "link" },
+    "category": { "path": "category", "default": "Kultur" },
+    "organizer": { "default": "Beispiel-Kulturzentrum" },
+    "locationName": { "default": "Beispiel-Kulturzentrum" },
+    "start": { "path": "pubdate", "format": "RFC1123Z" }
+  }
+}
+```
+
+> **Warning:** many feeds publish the date of the *post* in `pubDate`, not the
+> date of the event. Check a few entries against the website; the event date
+> is often in the title or the text and can be extracted with a
+> [regex](?page=field-mapping#extracting-with-regex).
+
+## JSON
+
+For JSON APIs. `itemsPath` points to the array of events in the response
+(for example `"data.items"`); if it is empty, the response itself is the
+array. `path` in the mapping is a dot path into one item.
+
+```json
+{
+  "type": "json",
+  "url": "https://example.org/api/events",
+  "itemsPath": "data.items",
+  "mapping": {
+    "sourceId": { "path": "id" },
+    "title": { "path": "name" },
+    "description": { "path": "text" },
+    "url": { "path": "detailUrl" },
+    "category": { "path": "tags.0", "default": "Unkategorisiert" },
+    "organizer": { "path": "organizer.name" },
+    "locationName": { "path": "location.title" },
+    "locationAddress": { "path": "location.address" },
+    "start": { "path": "startDateTime", "format": "2006-01-02T15:04:05Z07:00" },
+    "end": { "path": "endDateTime", "format": "2006-01-02T15:04:05Z07:00" },
+    "price": { "amountPath": "price.amount" }
+  }
+}
+```
+
+### Pagination
+
+`nextPath` points to the URL of the next page in the response, for example
+`"next_rest_url"` for the WordPress plugin *The Events Calendar*
+(`/wp-json/tribe/events/v1/events`). Pages are followed until there is no
+next page, `maxPages` (default 10) is reached, or a whole page lies beyond
+`daysAhead`. If a later page fails, the events collected so far are kept.
+
+## HTML
+
+For event pages without a feed or API, events are read from the HTML with
+CSS selectors in three steps:
+
+1. **`itemSelector`** finds each event container on the page.
+2. **`extract`** pulls named values out of each container.
+3. **`mapping`** works as for `json`; `path` refers to the names from
+   `extract`.
+
+```json
+{
+  "type": "html",
+  "url": "https://example.org/veranstaltungen.html",
+  "itemSelector": "#events .event",
+  "extract": {
+    "day": ".date .day", "month": ".date .month", "year": ".date .year",
+    "title": "h2",
+    "start": { "selector": "p.time", "regex": "(\\d{1,2}:\\d{2})" },
+    "end": { "selector": "p.time", "regex": "-\\s*(\\d{1,2}:\\d{2})" },
+    "description": { "selector": "p", "all": true, "skip": 2, "html": true }
+  },
+  "mapping": {
+    "title": { "path": "title" },
+    "description": { "path": "description" },
+    "start": { "template": "{day} {month} {year} {start}", "format": "2 Jan 2006 15:04|2 Jan 2006" },
+    "end": { "template": "{day} {month} {year} {end}", "format": "2 Jan 2006 15:04" }
+  }
+}
+```
+
+An `extract` entry is either a selector (`"title": "h2"`, the text of the
+first match) or an object:
+
+| Field | Meaning |
+|---|---|
+| `selector` | CSS selector relative to the container; empty = the container itself |
+| `attr` | an attribute instead of the text, for example `"href"`; relative URLs are resolved |
+| `html` | inner HTML instead of text, so that paragraphs of a description are kept |
+| `all`, `skip` | join all matches instead of only the first, skipping the first `skip` |
+| `regex` | extract part of the value ([rules](?page=field-mapping#extracting-with-regex)) |
+
+**Supported selectors:** `tag`, `*`, `.class`, `#id`, `[attr]`,
+`[attr=value]`, `[attr~=word]`, `[attr*=part]`, `:first-of-type`,
+`:nth-of-type(n)`, descendant (`a b`) and child (`a > b`). Selector lists
+(`,`) and sibling combinators are not supported.
+
+### Headings that group entries
+
+Some pages put a heading before a group of entries instead of around them,
+like a cinema programme:
+
+```html
+<h3 class="program_date1">Samstag, 21.11.2026</h3>
+<div class="program_entry"><a href="/film/x/1">12:45 Film X</a></div>
+<div class="program_entry"><a href="/film/y/2">20:15 Film Y</a></div>
+<h3 class="program_date1">Sonntag, 22.11.2026</h3>
+```
+
+With `"sectionSelector": "h3.program_date1"`, each entry gets the text of the
+last heading before it as the value `section`, usable in the mapping like an
+`extract` name:
+
+```json
+"start": {
+  "template": "{section} | {time}",
+  "regex": "(\\d{2}\\.\\d{2}\\.\\d{4})[^|]*[|]\\s*(\\d{1,2}:\\d{2})?",
+  "format": "02.01.2006 15:04|02.01.2006"
+}
+```
+
+### When the layout changes
+
+If `itemSelector` finds nothing, the source reports an error in its
+[status](?page=sources#health-status) instead of silently returning no
+events. Usually the page has been redesigned. HTML sources are inherently
+more fragile than feeds: if a site offers a feed or an API, use that.
+
+## Weekly Class Schedule (wcs)
+
+Some neighbourhood centres run WordPress with the "Weekly Class Schedule"
+plugin by CurlyThemes. Its weekly table is filled by JavaScript from
+`admin-ajax.php?action=wcs_get_events_json`; there is no feed. The `wcs` type
+reads that endpoint directly.
+
+```json
+{
+  "type": "wcs",
+  "url": "https://www.familienzentrum-weissensee.de",
+  "daysAhead": 30,
+  "organizer": "Familienzentrum Weißensee",
+  "locationDefault": "Familienzentrum Weißensee, Mahlerstraße 4, 13088 Berlin",
+  "wcsTypeIds": [27, 28, 29, 30],
+  "familyFriendly": true,
+  "categoryMap": {
+    "austausch": "Unkategorisiert",
+    "bewegung": "Sport",
+    "kreatives": "Kultur"
+  }
+}
+```
+
+- **`url`** is the site's base URL, not the Ajax endpoint.
+- **`wcsTypeIds` is required in practice.** Without it, the endpoint also
+  returns the demo classes that ship with the plugin template ("Advanced
+  Aqua Zumba", "Chemistry Lab", …). To find the IDs, open the calendar page
+  in the browser, look for the `admin-ajax.php?action=wcs_get_events_json`
+  request in the developer tools' Network tab and read its
+  `content[wcs_type][]` values.
+- **`locationDefault`:** the part before the first comma is the venue name,
+  the whole string the address; the room from the plugin is inserted after
+  the venue.
+- **`categoryMap`** keys can be the plugin's type slugs.
+- **`daysAhead`** sets the request window (default 30 days).
+- `familyFriendly` applies to every event. The plugin has no ticket or
+  registration information, so those attributes are always `false`.
+- Hidden occurrences are published as cancelled.
+
+> **Warning:** the plugin returns times with a `+00:00` suffix although they
+> are local times. The `wcs` type therefore reads them as the instance's local
+> time. This is a verified quirk of this plugin, not a rule: for every new
+> source, compare a few times with the website.
+
+## Steps
+
+Some listings can't be read with one request. An event widget may put only
+the event IDs into its page and load the entries from a second address; an
+overview page may link to detail pages. `steps` run before the main request
+and **collect variables** instead of events. The main request then uses them.
+Steps work with every type that fetches a `url` (`html`, `json`, `rss`,
+`ical`).
+
+```json
+{
+  "type": "html",
+  "daysAhead": 14,
+  "steps": [
+    {
+      "url": "https://example.org/widget/?dateFrom={today}&dateTo={until}",
+      "collect": {
+        "ids": { "selector": "[data-idents]", "attr": "data-idents", "split": "," }
+      }
+    }
+  ],
+  "url": "https://example.org/widget/items?layout=list",
+  "forEach": { "var": "ids", "param": "object[]", "batch": 100 },
+  "itemSelector": "article[data-ident]",
+  "extract": { "title": "h2" },
+  "mapping": { "title": { "path": "title" } }
+}
+```
+
+A step has a `url`, an optional `type` (`html`, the default, or `json`) and
+`collect`, which names the variables it produces:
+
+| Field | Meaning |
+|---|---|
+| `selector` | `html`: CSS selector, matched against the whole page; every match counts |
+| `attr` | `html`: an attribute instead of the text; relative `href`/`src` are resolved |
+| `path` | `json`: dot path; `*` stands for every element of an array, for example `data.*.id` |
+| `regex` | extract part of each value ([rules](?page=field-mapping#extracting-with-regex)); no match drops it |
+| `split` | split each value further, for example `","` for `a,b,c` |
+
+Values are trimmed, empty ones dropped and duplicates removed. A variable
+that ends up empty is an error in the source's
+[status](?page=sources#health-status), as when `itemSelector` finds nothing.
+
+**Placeholders** in the URLs of steps and of the main request:
+
+- `{today}` and `{until}`: today and today + `daysAhead` (default 30), as
+  `YYYY-MM-DD` in the instance's time zone. They also work without steps,
+  for example in an iCal URL that wants a date range.
+- `{name}`: the first value of a collected variable.
+- `{item}`: the current value of `forEach` (see below).
+
+Values are query-escaped, except when a placeholder is the whole URL
+(`"url": "{item}"` for collected links). An unknown placeholder is an error.
+
+**`forEach`** repeats the main request for the values of a variable:
+
+- with `param`, values are added as repeated query parameters
+  (`object[]=a&object[]=b`), `batch` values per request (default 1);
+- without `param`, one request per value, with `{item}` in `url`.
+
+The events of all requests are combined. If one request fails, the events of
+the others are kept. `maxRequests` (default 20) caps the requests of one run;
+the rest is skipped with a log line.
+
+Slow endpoints can get more time with `timeoutSeconds` (default 20, at most
+180; the whole run has `fetchTimeoutMinutes`, default five). Keep the number
+of requests small: every run repeats all of them, and each one costs the
+site's server work too.
+
+### Request pacing
+
+Some sites ask crawlers to wait between requests, for example with
+`Crawl-delay: 5` in their `robots.txt`. `requestDelaySeconds` honours that:
+
+```json
+"requestDelaySeconds": 5,
+"timeoutSeconds": 180
+```
+
+- The delay is the minimum time between the **starts** of two requests
+  (steps and `forEach` requests). A request that took longer is followed
+  without extra wait.
+- `timeoutSeconds` then limits **each request**, not the whole source.
+- Paced sources run **last**, after all other sources and the inbox, so they
+  only use the time the others left. The whole source is bounded by the run's
+  limit (`fetchTimeoutMinutes` in [instance.json](?page=configuration#instancejson)).
+  If it runs out, the events of the finished requests are kept.
+
+## Presets
+
+A preset is a source config for a platform that many sites use with the same
+markup. It ships with the core, so a change of the platform is fixed once, in
+a release, instead of in every instance. The source file names the preset and
+fills its parameters:
+
+```json
+{
+  "label": "Veranstaltungen Stralsund",
+  "preset": "infomax",
+  "params": {
+    "host": "tmvwhl.infomaxnet.de",
+    "permalink": "stadt-stralsund-de",
+    "widgetToken": "4YRcdHbzey0."
+  },
+  "daysAhead": 30
+}
+```
+
+Every other field of the file overrides the preset: plain values and arrays
+replace the preset's, objects such as `mapping` or `extract` are merged key by
+key. `"mapping": { "category": { "default": "Kultur" } }` changes only the
+category and keeps the rest of the preset's mapping. The status is written
+into the source file; the preset itself never changes.
+
+An unknown preset, a missing required parameter or a parameter the preset
+doesn't have makes the pipeline skip the file with a log line.
+
+### infomax
+
+Event widget by infomax websolutions, used for example by the tourism board
+of Mecklenburg-Western Pomerania. The parameters are in the widget URL
+`https://<host>/<permalink>/?widgetToken=<widgetToken>`:
+
+| Parameter | Required | Example |
+|---|---|---|
+| `host` | yes | `tmvwhl.infomaxnet.de` |
+| `permalink` | yes | `stadt-stralsund-de` |
+| `widgetToken` | yes | `4YRcdHbzey0.` |
+| `language` | no, default `de` | `de` |
+
+The preset reads the event IDs from the widget page for `daysAhead` (default
+14) and loads the entries in batches of 100. The widget's `robots.txt` asks
+for a crawl delay of 5 seconds, so the preset waits 5 seconds between
+requests ([request pacing](#request-pacing)). It renders uncached entries
+slowly (a batch can take about 18 seconds), so each request may take 180
+seconds; keep `daysAhead` as small as the calendar needs. Check with the
+operator of the widget whether you may reuse its events.
+
+The widget lists several categories per event, alphabetically ("Ausstellung,
+Führungen & Touren"). The preset keeps all of them
+(`"categorySeparator": ", "`) and marks events with the category "Kinder" as
+family-friendly. Map them with `categoryMap` and filter with
+`categoryFilter` ([Categories](?page=categories#filtering-by-category)), for
+example to drop exhibitions but keep guided tours of them.
+
+Widgets with a wide radius list events of neighbouring towns too. The info
+line ends in "Venue, Town", which becomes the location name, so a town filter
+is an `include` rule that matches only the end of it:
+
+```json
+"include": [{ "field": "location", "regex": "(?i),\\s*Stralsund\\s*$" }]
+```
+
+Long-running exhibitions appear once per opening day; see
+[issue #63](https://github.com/schreibtischhelden/openlitfass/issues/63).
+
+## Time zones
+
+Every source needs its own check of how it writes times. Platforms are
+careless with time zones: some write UTC, some local time with a wrong
+offset, some local time without any offset. Compare a few events with the
+times published on the organiser's website before relying on a source. For
+`rss`, `json` and `html` sources, see
+[Times](?page=field-mapping#times).

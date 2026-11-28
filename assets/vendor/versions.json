@@ -1,0 +1,8 @@
+{
+	"showdown": "2.1.0",
+	"dompurify": "3.5.0",
+	"@schreibtischhelden/showdown-forms": "1.0.0",
+	"@schreibtischhelden/markdown-pages-editor": "1.0.0",
+	"@highlightjs/cdn-assets": "11.12.0",
+	"@picocss/pico": "2.1.1"
+}
