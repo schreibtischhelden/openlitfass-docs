@@ -102,7 +102,9 @@ of `<head>` with `defer`: the start page and, with static pages enabled,
 the event, list and place pages. Without the file, no script tag is added.
 It survives core updates, so it is the place for your own additions, for
 example privacy-friendly visitor statistics such as a self-hosted Plausible
-or Umami. The script can load the provider's script itself:
+or Umami. The example instance contains this as a template,
+`site/custom-script.example.js`; rename it to `custom-script.js` to use it.
+The script can load the provider's script itself:
 
 ```js
 const s = document.createElement("script");
