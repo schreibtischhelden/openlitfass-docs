@@ -11,9 +11,8 @@ site/
   logo.svg             logo in the header and source of the favicon
   icon-192.png         optional: PWA and touch icon
   icon-512.png         optional: PWA icon
-  pages/impressum.md   legal notice as a Markdown page
-  pages/datenschutz.md privacy policy as a Markdown page
-  pages/<name>.md      any other Markdown page, shown at seite.html?page=<name>
+  impressum.html       legal notice (if imprintUrl points here)
+  datenschutz.html     privacy policy (if privacyUrl points here)
   custom-script.js     optional: your own script on every page
   …                    any other files: fonts, images, robots.txt
 ```
@@ -128,12 +127,9 @@ Keep in mind:
 ## Legal pages
 
 The example instance contains templates for a legal notice
-(`site/pages/impressum.md`) and a privacy policy
-(`site/pages/datenschutz.md`). Adapt them and point `imprintUrl` and
-`privacyUrl` in `instance.json` to them (see
-[Markdown pages](#markdown-pages)), or link existing pages with absolute
-URLs. HTML pages in `site/` (for example `"imprintUrl": "impressum.html"`)
-keep working.
+(`site/impressum.html`) and a privacy policy (`site/datenschutz.html`).
+Adapt them and point `imprintUrl` and `privacyUrl` in `instance.json` to
+them, or link existing pages with absolute URLs.
 
 The privacy policy should mention:
 
@@ -145,40 +141,6 @@ The privacy policy should mention:
 - whatever `site/custom-script.js` loads, if you use it.
 
 openLitfass itself sets no cookies and uses no tracking.
-
-## Markdown pages
-
-Pages such as the legal notice can be written in Markdown instead of HTML:
-put them in `site/pages/<name>.md`. When an instance has at least one such
-page, `build-site` writes `seite.html`, a page with the header and footer of
-the calendar, and the page appears at `seite.html?page=<name>`:
-
-```json
-{
-  "imprintUrl": "seite.html?page=impressum",
-  "privacyUrl": "seite.html?page=datenschutz"
-}
-```
-
-- The page is rendered in the browser by
-  [markdown-pages.js](https://github.com/schreibtischhelden/markdown-pages.js)
-  (Showdown, sanitised with DOMPurify), the same renderer as the preview in
-  the [config UI](https://config.openlitfass.org). The first heading becomes
-  the page title.
-- Page names may contain letters, digits, `-`, `_` and `.`; they must not
-  start with a dot.
-- `seite.html` is generated: a file with that name in `site/` is
-  overwritten.
-- A page that does not exist shows `site/404.md` (the example instance has
-  one), or an English "Page not found" note without it.
-- markdown-pages.js also asks for `header.md` and `footer.md` in the site
-  root. The header and footer of `seite.html` always come from the core, so
-  these requests end in a harmless 404 in the browser console.
-- Visitors without JavaScript get a list of links to the Markdown files,
-  which browsers show as plain text. Search engines that do not run
-  JavaScript see the same list.
-- The service worker keeps every Markdown page that has been opened, so it
-  also opens offline afterwards.
 
 ## Texts
 
