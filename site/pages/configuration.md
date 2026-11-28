@@ -49,8 +49,8 @@ also load a whole instance, from its folder, a ZIP or a public git repository
 | `themeColor` | – | browser theme colour and PWA colours; also the background of the generated favicon |
 | `shortName` | `name` | name below the app icon when installed (about 12 characters) |
 | `about` | – | text of the About page; plain text, blank lines separate paragraphs |
-| `imprintUrl` | – | legal notice (*Impressum*); absolute URL, a [Markdown page](?page=theming#markdown-pages) (`seite.html?page=impressum`) or an HTML page in `site/` |
-| `privacyUrl` | – | privacy policy; absolute URL, a [Markdown page](?page=theming#markdown-pages) (`seite.html?page=datenschutz`) or an HTML page in `site/` |
+| `imprintUrl` | – | legal notice (*Impressum*); absolute URL or a page in `site/` |
+| `privacyUrl` | – | privacy policy; absolute URL or a page in `site/` |
 | `submitUrl` | – | where people report a missing event ("Termin melden"): a form or a `mailto:` link |
 | `issuesUrl` | – | the instance's own issue tracker for wrong events, missing sources or places |
 | `fetchTimeoutMinutes` | `5` | time limit of a whole fetch run; the sources run one after another, so raise it for many or paced (`requestDelaySeconds`) sources |

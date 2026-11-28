@@ -28,8 +28,8 @@ Both ways use the same instance directory, so you can switch later.
 3. Edit `instance.json`: at least `name`, `title`, `baseUrl` and `timezone`,
    by hand or with the [config UI](https://config.openlitfass.org/?page=instance).
    All fields: [instance.json](?page=configuration#instancejson).
-4. Adapt the legal notice (`site/pages/impressum.md`) and the privacy policy
-   (`site/pages/datenschutz.md`), or point `imprintUrl` and `privacyUrl` to
+4. Adapt the legal notice (`site/impressum.html`) and the privacy policy
+   (`site/datenschutz.html`), or point `imprintUrl` and `privacyUrl` to
    existing pages. A public website operated in Germany needs a legal notice.
 5. Add sources: copy a template from `sources/`, remove `.example` from the
    file name and adjust the URL and mapping, or create the file with the
